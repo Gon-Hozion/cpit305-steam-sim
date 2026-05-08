@@ -165,4 +165,30 @@ public class DatabaseManager {
 
     return result.toString();
 }
+    
+   public static String getGameFilePath(int gameId) {
+
+    String sql = "SELECT file_path FROM games WHERE id = ?";
+
+    try (
+            Connection conn = getConnection();
+
+            java.sql.PreparedStatement stmt =
+                    conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, gameId);
+
+        java.sql.ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            return rs.getString("file_path");
+        }
+
+    } catch (SQLException e) {
+        System.out.println("Failed to get game file path: " + e.getMessage());
+    }
+
+    return null;
+} 
 }
