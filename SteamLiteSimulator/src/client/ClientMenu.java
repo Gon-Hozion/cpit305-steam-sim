@@ -18,18 +18,26 @@ public class ClientMenu {
     public static void connectToServer() {
 
         try {
+
             socket = new Socket("localhost", 5000);
 
             serverInput = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
+                    new InputStreamReader(socket.getInputStream())
+            );
 
-            serverOutput = new PrintWriter(socket.getOutputStream(), true);
+            serverOutput = new PrintWriter(
+                    socket.getOutputStream(),
+                    true
+            );
 
             System.out.println(serverInput.readLine());
 
         } catch (IOException e) {
+
             System.out.println("Could not connect to server.");
+
             System.out.println(e.getMessage());
+
             System.exit(0);
         }
     }
@@ -41,12 +49,15 @@ public class ClientMenu {
         while (true) {
 
             System.out.println("\n=== STEAM LITE SIMULATOR ===");
+
             System.out.println("1. Register");
             System.out.println("2. Login");
             System.out.println("3. View Games");
-            System.out.println("4. Exit");
+            System.out.println("4. Download Game");
+            System.out.println("5. Exit");
 
             System.out.print("Choose option: ");
+
             int choice = input.nextInt();
 
             switch (choice) {
@@ -64,6 +75,10 @@ public class ClientMenu {
                     break;
 
                 case 4:
+                    downloadGameMenu();
+                    break;
+
+                case 5:
                     sendCommand("EXIT");
                     System.out.println("Goodbye!");
                     System.exit(0);
@@ -85,12 +100,18 @@ public class ClientMenu {
         System.out.print("Password: ");
         String password = input.next();
 
-        String response = sendCommand("REGISTER " + username + " " + password);
+        String response =
+                sendCommand("REGISTER " + username + " " + password);
 
         if (response.equals("REGISTER_SUCCESS")) {
+
             System.out.println("Account created successfully!");
+
         } else {
-            System.out.println("Registration failed. Username may already exist.");
+
+            System.out.println(
+                    "Registration failed. Username may already exist."
+            );
         }
     }
 
@@ -104,15 +125,19 @@ public class ClientMenu {
         System.out.print("Password: ");
         String password = input.next();
 
-        String response = sendCommand("LOGIN " + username + " " + password);
+        String response =
+                sendCommand("LOGIN " + username + " " + password);
 
         if (response.startsWith("LOGIN_SUCCESS")) {
+
             String role = response.split(" ")[1];
 
             System.out.println("Login successful!");
+
             System.out.println("Role: " + role);
 
         } else {
+
             System.out.println("Invalid username or password.");
         }
     }
@@ -124,20 +149,80 @@ public class ClientMenu {
         serverOutput.println("VIEW_GAMES");
 
         try {
+
             String line = serverInput.readLine();
 
             if (line.equals("GAMES_START")) {
 
                 while (!(line = serverInput.readLine()).equals("GAMES_END")) {
+
                     System.out.println(line);
                 }
 
             } else {
+
                 System.out.println(line);
             }
 
         } catch (IOException e) {
+
             System.out.println("Failed to receive games from server.");
+        }
+    }
+
+    public static void downloadGameMenu() {
+
+        System.out.println("\n=== DOWNLOAD GAME ===");
+
+        System.out.print("Enter game ID: ");
+
+        int gameId = input.nextInt();
+
+        serverOutput.println("DOWNLOAD " + gameId);
+
+        try {
+
+            String response = serverInput.readLine();
+
+            if (response.equals("DOWNLOAD_READY")) {
+
+                System.out.println("Downloading game...");
+
+                java.io.FileOutputStream fileOutput =
+                        new java.io.FileOutputStream(
+                                "downloaded_game.zip"
+                        );
+
+                byte[] buffer = new byte[4096];
+
+                int bytesRead;
+
+                while ((bytesRead =
+                        socket.getInputStream().read(buffer)) != -1) {
+
+                    fileOutput.write(buffer, 0, bytesRead);
+
+                    if (bytesRead < 4096) {
+                        break;
+                    }
+                }
+
+                fileOutput.close();
+
+                System.out.println("Download completed!");
+
+            } else {
+
+                System.out.println(
+                        "Download failed: " + response
+                );
+            }
+
+        } catch (IOException e) {
+
+            System.out.println(
+                    "Download error: " + e.getMessage()
+            );
         }
     }
 
@@ -146,8 +231,11 @@ public class ClientMenu {
         serverOutput.println(command);
 
         try {
+
             return serverInput.readLine();
+
         } catch (IOException e) {
+
             return "ERROR";
         }
     }
