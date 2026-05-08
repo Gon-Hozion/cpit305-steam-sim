@@ -34,4 +34,96 @@ public class DatabaseManager {
         }
 
     }
+
+    public static boolean registerUser(String username, String password) {
+
+        String sql =
+                "INSERT INTO accounts(username, password, role) VALUES (?, ?, 'user')";
+
+        try (
+                Connection conn = getConnection();
+
+                java.sql.PreparedStatement stmt =
+                        conn.prepareStatement(sql)
+        ) {
+
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+
+            stmt.executeUpdate();
+
+            return true;
+
+        } catch (SQLException e) {
+
+            System.out.println("Registration failed!");
+
+            System.out.println(e.getMessage());
+
+            return false;
+        }
+    }
+
+    public static String loginUser(String username, String password) {
+
+        String sql =
+                "SELECT role FROM accounts WHERE username = ? AND password = ?";
+
+        try (
+                Connection conn = getConnection();
+
+                java.sql.PreparedStatement stmt =
+                        conn.prepareStatement(sql)
+        ) {
+
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+
+            java.sql.ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+
+                return rs.getString("role");
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println("Login failed!");
+
+            System.out.println(e.getMessage());
+        }
+
+        return null;
+    }
+
+    public static void showAllGames() {
+
+        String sql = "SELECT * FROM games";
+
+        try (
+                Connection conn = getConnection();
+
+                java.sql.PreparedStatement stmt =
+                        conn.prepareStatement(sql);
+
+                java.sql.ResultSet rs = stmt.executeQuery()
+        ) {
+
+            while (rs.next()) {
+
+                System.out.println(
+                        rs.getInt("id") + " - " +
+                        rs.getString("title") + " | " +
+                        rs.getString("genre") + " | $" +
+                        rs.getDouble("price")
+                );
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println("Failed to load games!");
+
+            System.out.println(e.getMessage());
+        }
+    }
 }
