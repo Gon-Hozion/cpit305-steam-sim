@@ -1,13 +1,42 @@
 package client;
 
-import database.DatabaseManager;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.Scanner;
 
 public class ClientMenu {
 
     private static Scanner input = new Scanner(System.in);
 
+    private static Socket socket;
+    private static BufferedReader serverInput;
+    private static PrintWriter serverOutput;
+
+    public static void connectToServer() {
+
+        try {
+            socket = new Socket("localhost", 5000);
+
+            serverInput = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream()));
+
+            serverOutput = new PrintWriter(socket.getOutputStream(), true);
+
+            System.out.println(serverInput.readLine());
+
+        } catch (IOException e) {
+            System.out.println("Could not connect to server.");
+            System.out.println(e.getMessage());
+            System.exit(0);
+        }
+    }
+
     public static void showMainMenu() {
+
+        connectToServer();
 
         while (true) {
 
@@ -35,6 +64,7 @@ public class ClientMenu {
                     break;
 
                 case 4:
+                    sendCommand("EXIT");
                     System.out.println("Goodbye!");
                     System.exit(0);
                     break;
@@ -55,9 +85,9 @@ public class ClientMenu {
         System.out.print("Password: ");
         String password = input.next();
 
-        boolean success = DatabaseManager.registerUser(username, password);
+        String response = sendCommand("REGISTER " + username + " " + password);
 
-        if (success) {
+        if (response.equals("REGISTER_SUCCESS")) {
             System.out.println("Account created successfully!");
         } else {
             System.out.println("Registration failed. Username may already exist.");
@@ -74,11 +104,14 @@ public class ClientMenu {
         System.out.print("Password: ");
         String password = input.next();
 
-        String role = DatabaseManager.loginUser(username, password);
+        String response = sendCommand("LOGIN " + username + " " + password);
 
-        if (role != null) {
+        if (response.startsWith("LOGIN_SUCCESS")) {
+            String role = response.split(" ")[1];
+
             System.out.println("Login successful!");
             System.out.println("Role: " + role);
+
         } else {
             System.out.println("Invalid username or password.");
         }
@@ -88,6 +121,34 @@ public class ClientMenu {
 
         System.out.println("\n=== GAME LIST ===");
 
-        DatabaseManager.showAllGames();
+        serverOutput.println("VIEW_GAMES");
+
+        try {
+            String line = serverInput.readLine();
+
+            if (line.equals("GAMES_START")) {
+
+                while (!(line = serverInput.readLine()).equals("GAMES_END")) {
+                    System.out.println(line);
+                }
+
+            } else {
+                System.out.println(line);
+            }
+
+        } catch (IOException e) {
+            System.out.println("Failed to receive games from server.");
+        }
+    }
+
+    public static String sendCommand(String command) {
+
+        serverOutput.println(command);
+
+        try {
+            return serverInput.readLine();
+        } catch (IOException e) {
+            return "ERROR";
+        }
     }
 }
