@@ -123,6 +123,46 @@ public class ClientHandler extends Thread {
 
                         output.println("INVALID_DOWNLOAD_COMMAND");
                     }
+                } else if (command.startsWith("RATE_GAME")) {
+
+                    String[] parts = command.split(" ");
+
+                    if (parts.length == 4) {
+
+                        try {
+                            int accountId = Integer.parseInt(parts[1]);
+                            int gameId = Integer.parseInt(parts[2]);
+                            int rating = Integer.parseInt(parts[3]);
+
+                            boolean success
+                                    = DatabaseManager.rateGame(accountId, gameId, rating);
+
+                            if (success) {
+                                output.println("RATING_SUCCESS");
+                            } else {
+                                output.println("RATING_FAILED");
+                            }
+
+                        } catch (NumberFormatException e) {
+                            output.println("INVALID_RATING_COMMAND");
+                        }
+
+                    } else {
+                        output.println("INVALID_RATING_COMMAND");
+                    }
+                } else if (command.equals("VIEW_GAMES_RATINGS")) {
+
+                    String games = DatabaseManager.getGamesWithRatingsText();
+
+                    output.println("GAMES_START");
+
+                    String[] lines = games.split("\n");
+
+                    for (String line : lines) {
+                        output.println(line);
+                    }
+
+                    output.println("GAMES_END");
                 } else if (command.equals("EXIT")) {
 
                     output.println("Goodbye!");
