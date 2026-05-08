@@ -1,13 +1,26 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package server;
 
-/**
- *
- * @author Mohammed
- */
-public class ClientHandler {
-    
+import java.io.IOException;
+import java.net.Socket;
+
+public class ClientHandler extends Thread {
+
+    private Socket socket;
+
+    public ClientHandler(Socket socket) {
+        this.socket = socket;
+    }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println("Client is being handled by: " + Thread.currentThread().getName());
+
+            // For now, just keep connection briefly
+            socket.close();
+
+        } catch (IOException e) {
+            System.out.println("Client handler error: " + e.getMessage());
+        }
+    }
 }

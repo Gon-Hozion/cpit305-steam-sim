@@ -17,6 +17,9 @@ public class Server {
             while (true) {
                 Socket socket = serverSocket.accept();
                 System.out.println("New client connected: " + socket.getInetAddress());
+
+                ClientHandler handler = new ClientHandler(socket);
+                handler.start();
             }
 
         } catch (IOException e) {
