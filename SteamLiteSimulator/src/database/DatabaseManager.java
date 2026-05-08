@@ -126,4 +126,43 @@ public class DatabaseManager {
             System.out.println(e.getMessage());
         }
     }
+    
+    public static String getAllGamesText() {
+
+    String sql = "SELECT * FROM games";
+
+    StringBuilder result = new StringBuilder();
+
+    try (
+            Connection conn = getConnection();
+
+            java.sql.PreparedStatement stmt =
+                    conn.prepareStatement(sql);
+
+            java.sql.ResultSet rs = stmt.executeQuery()
+    ) {
+
+        while (rs.next()) {
+
+            result.append(rs.getInt("id"))
+                    .append(" - ")
+                    .append(rs.getString("title"))
+                    .append(" | ")
+                    .append(rs.getString("genre"))
+                    .append(" | $")
+                    .append(rs.getDouble("price"))
+                    .append("\n");
+        }
+
+    } catch (SQLException e) {
+
+        return "Failed to load games: " + e.getMessage();
+    }
+
+    if (result.length() == 0) {
+        return "No games available.";
+    }
+
+    return result.toString();
+}
 }
