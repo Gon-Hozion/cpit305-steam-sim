@@ -186,13 +186,18 @@ public class ClientMenu {
                 byte[] buffer = new byte[4096];
                 int bytesRead;
                 int totalBytes = 0;
+                int fileSize = 5000;
 
                 while ((bytesRead = socket.getInputStream().read(buffer)) != -1) {
 
                     fileOutput.write(buffer, 0, bytesRead);
                     totalBytes += bytesRead;
 
-                    int progress = Math.min(totalBytes / 1000, 100);
+                    int progress = (totalBytes * 100) / fileSize;
+
+                    if (progress > 100) {
+                        progress = 100;
+                    }
 
                     printProgressBar(progress);
 
