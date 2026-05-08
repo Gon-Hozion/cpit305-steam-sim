@@ -19,13 +19,10 @@ public class ClientHandler extends Thread {
     public void run() {
 
         try (
-                BufferedReader input =
-                        new BufferedReader(
-                                new InputStreamReader(socket.getInputStream()));
-
-                PrintWriter output =
-                        new PrintWriter(socket.getOutputStream(), true)
-        ) {
+                BufferedReader input
+                = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream())); PrintWriter output
+                = new PrintWriter(socket.getOutputStream(), true)) {
 
             output.println("Connected to Steam Lite Server");
 
@@ -41,8 +38,8 @@ public class ClientHandler extends Thread {
 
                     if (parts.length == 3) {
 
-                        boolean success =
-                                DatabaseManager.registerUser(parts[1], parts[2]);
+                        boolean success
+                                = DatabaseManager.registerUser(parts[1], parts[2]);
 
                         if (success) {
                             output.println("REGISTER_SUCCESS");
@@ -60,8 +57,8 @@ public class ClientHandler extends Thread {
 
                     if (parts.length == 3) {
 
-                        String role =
-                                DatabaseManager.loginUser(parts[1], parts[2]);
+                        String role
+                                = DatabaseManager.loginUser(parts[1], parts[2]);
 
                         if (role != null) {
                             output.println("LOGIN_SUCCESS " + role);
@@ -87,6 +84,45 @@ public class ClientHandler extends Thread {
 
                     output.println("GAMES_END");
 
+                } else if (command.startsWith("DOWNLOAD")) {
+
+                    String[] parts = command.split(" ");
+
+                    if (parts.length == 2) {
+
+                        try {
+                            int gameId = Integer.parseInt(parts[1]);
+
+                            String filePath = DatabaseManager.getGameFilePath(gameId);
+
+                            if (filePath == null) {
+
+                                output.println("DOWNLOAD_FAILED");
+
+                            } else {
+
+                                output.println("DOWNLOAD_READY");
+
+                                boolean sent
+                                        = FileTransferManager.sendFile(
+                                                filePath,
+                                                socket.getOutputStream()
+                                        );
+
+                                if (!sent) {
+                                    System.out.println("File sending failed.");
+                                }
+                            }
+
+                        } catch (NumberFormatException e) {
+
+                            output.println("INVALID_GAME_ID");
+                        }
+
+                    } else {
+
+                        output.println("INVALID_DOWNLOAD_COMMAND");
+                    }
                 } else if (command.equals("EXIT")) {
 
                     output.println("Goodbye!");
