@@ -1,5 +1,6 @@
 package client;
 
+import database.DatabaseManager;
 import java.util.Scanner;
 
 public class ClientMenu {
@@ -11,14 +12,12 @@ public class ClientMenu {
         while (true) {
 
             System.out.println("\n=== STEAM LITE SIMULATOR ===");
-
             System.out.println("1. Register");
             System.out.println("2. Login");
             System.out.println("3. View Games");
             System.out.println("4. Exit");
 
             System.out.print("Choose option: ");
-
             int choice = input.nextInt();
 
             switch (choice) {
@@ -56,7 +55,13 @@ public class ClientMenu {
         System.out.print("Password: ");
         String password = input.next();
 
-        System.out.println("Register feature coming soon...");
+        boolean success = DatabaseManager.registerUser(username, password);
+
+        if (success) {
+            System.out.println("Account created successfully!");
+        } else {
+            System.out.println("Registration failed. Username may already exist.");
+        }
     }
 
     public static void loginMenu() {
@@ -69,13 +74,20 @@ public class ClientMenu {
         System.out.print("Password: ");
         String password = input.next();
 
-        System.out.println("Login feature coming soon...");
+        String role = DatabaseManager.loginUser(username, password);
+
+        if (role != null) {
+            System.out.println("Login successful!");
+            System.out.println("Role: " + role);
+        } else {
+            System.out.println("Invalid username or password.");
+        }
     }
 
     public static void viewGamesMenu() {
 
         System.out.println("\n=== GAME LIST ===");
 
-        System.out.println("Loading games...");
+        DatabaseManager.showAllGames();
     }
 }
