@@ -22,13 +22,11 @@ public class ClientMenu {
             socket = new Socket("localhost", 5000);
 
             serverInput = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream())
-            );
+                    new InputStreamReader(socket.getInputStream()));
 
             serverOutput = new PrintWriter(
                     socket.getOutputStream(),
-                    true
-            );
+                    true);
 
             System.out.println(serverInput.readLine());
 
@@ -100,8 +98,7 @@ public class ClientMenu {
         System.out.print("Password: ");
         String password = input.next();
 
-        String response =
-                sendCommand("REGISTER " + username + " " + password);
+        String response = sendCommand("REGISTER " + username + " " + password);
 
         if (response.equals("REGISTER_SUCCESS")) {
 
@@ -110,8 +107,7 @@ public class ClientMenu {
         } else {
 
             System.out.println(
-                    "Registration failed. Username may already exist."
-            );
+                    "Registration failed. Username may already exist.");
         }
     }
 
@@ -125,8 +121,7 @@ public class ClientMenu {
         System.out.print("Password: ");
         String password = input.next();
 
-        String response =
-                sendCommand("LOGIN " + username + " " + password);
+        String response = sendCommand("LOGIN " + username + " " + password);
 
         if (response.startsWith("LOGIN_SUCCESS")) {
 
@@ -175,32 +170,31 @@ public class ClientMenu {
         System.out.println("\n=== DOWNLOAD GAME ===");
 
         System.out.print("Enter game ID: ");
-
         int gameId = input.nextInt();
 
         serverOutput.println("DOWNLOAD " + gameId);
 
         try {
-
             String response = serverInput.readLine();
 
             if (response.equals("DOWNLOAD_READY")) {
 
                 System.out.println("Downloading game...");
 
-                java.io.FileOutputStream fileOutput =
-                        new java.io.FileOutputStream(
-                                "downloaded_game.zip"
-                        );
+                java.io.FileOutputStream fileOutput = new java.io.FileOutputStream("downloaded_game.zip");
 
                 byte[] buffer = new byte[4096];
-
                 int bytesRead;
+                int totalBytes = 0;
 
-                while ((bytesRead =
-                        socket.getInputStream().read(buffer)) != -1) {
+                while ((bytesRead = socket.getInputStream().read(buffer)) != -1) {
 
                     fileOutput.write(buffer, 0, bytesRead);
+                    totalBytes += bytesRead;
+
+                    int progress = Math.min(totalBytes / 1000, 100);
+
+                    printProgressBar(progress);
 
                     if (bytesRead < 4096) {
                         break;
@@ -209,21 +203,36 @@ public class ClientMenu {
 
                 fileOutput.close();
 
-                System.out.println("Download completed!");
+                System.out.println("\nDownload completed!");
 
             } else {
-
-                System.out.println(
-                        "Download failed: " + response
-                );
+                System.out.println("Download failed: " + response);
             }
 
-        } catch (IOException e) {
-
-            System.out.println(
-                    "Download error: " + e.getMessage()
-            );
+        } catch (java.io.IOException e) {
+            System.out.println("Download error: " + e.getMessage());
         }
+    }
+
+    public static void printProgressBar(int progress) {
+
+        int totalBars = 20;
+        int filledBars = progress * totalBars / 100;
+
+        StringBuilder bar = new StringBuilder("[");
+
+        for (int i = 0; i < totalBars; i++) {
+
+            if (i < filledBars) {
+                bar.append("#");
+            } else {
+                bar.append("-");
+            }
+        }
+
+        bar.append("] ").append(progress).append("%");
+
+        System.out.print("\r" + bar.toString());
     }
 
     public static String sendCommand(String command) {
