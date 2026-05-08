@@ -191,4 +191,71 @@ public class DatabaseManager {
 
     return null;
 } 
+   public static boolean rateGame(int accountId, int gameId, int rating) {
+
+    String sql =
+            "INSERT INTO ratings(account_id, game_id, rating) VALUES (?, ?, ?)";
+
+    try (
+            Connection conn = getConnection();
+            java.sql.PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, accountId);
+        stmt.setInt(2, gameId);
+        stmt.setInt(3, rating);
+
+        stmt.executeUpdate();
+        return true;
+
+    } catch (SQLException e) {
+        System.out.println("Failed to rate game!");
+        System.out.println(e.getMessage());
+        return false;
+    }
+}
+   public static String getGamesWithRatingsText() {
+
+    String sql =
+            "SELECT g.id, g.title, g.genre, g.price, AVG(r.rating) AS avg_rating " +
+            "FROM games g " +
+            "LEFT JOIN ratings r ON g.id = r.game_id " +
+            "GROUP BY g.id, g.title, g.genre, g.price";
+
+    StringBuilder result = new StringBuilder();
+
+    try (
+            Connection conn = getConnection();
+            java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
+            java.sql.ResultSet rs = stmt.executeQuery()
+    ) {
+
+        while (rs.next()) {
+
+            double avgRating = rs.getDouble("avg_rating");
+
+            result.append(rs.getInt("id"))
+                    .append(" - ")
+                    .append(rs.getString("title"))
+                    .append(" | ")
+                    .append(rs.getString("genre"))
+                    .append(" | $")
+                    .append(rs.getDouble("price"))
+                    .append(" | Rating: ");
+
+            if (rs.wasNull()) {
+                result.append("No ratings yet");
+            } else {
+                result.append(String.format("%.1f/5", avgRating));
+            }
+
+            result.append("\n");
+        }
+
+    } catch (SQLException e) {
+        return "Failed to load games with ratings: " + e.getMessage();
+    }
+
+    return result.toString();
+}
 }
