@@ -258,4 +258,82 @@ public class DatabaseManager {
 
     return result.toString();
 }
+   public static boolean addGame(String title, String developer, String genre, double price, String filePath) {
+
+    String sql =
+            "INSERT INTO games(title, developer, genre, price, file_path) VALUES (?, ?, ?, ?, ?)";
+
+    try (
+            Connection conn = getConnection();
+            java.sql.PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setString(1, title);
+        stmt.setString(2, developer);
+        stmt.setString(3, genre);
+        stmt.setDouble(4, price);
+        stmt.setString(5, filePath);
+
+        stmt.executeUpdate();
+        return true;
+
+    } catch (SQLException e) {
+        System.out.println("Failed to add game!");
+        System.out.println(e.getMessage());
+        return false;
+    }
+}
+   public static boolean deleteGame(int gameId) {
+
+    String sql = "DELETE FROM games WHERE id = ?";
+
+    try (
+            Connection conn = getConnection();
+            java.sql.PreparedStatement stmt = conn.prepareStatement(sql)
+    ) {
+
+        stmt.setInt(1, gameId);
+
+        int rows = stmt.executeUpdate();
+
+        return rows > 0;
+
+    } catch (SQLException e) {
+        System.out.println("Failed to delete game!");
+        System.out.println(e.getMessage());
+        return false;
+    }
+}
+   public static String getAllUsersText() {
+
+    String sql = "SELECT id, username, role FROM accounts";
+
+    StringBuilder result = new StringBuilder();
+
+    try (
+            Connection conn = getConnection();
+            java.sql.PreparedStatement stmt = conn.prepareStatement(sql);
+            java.sql.ResultSet rs = stmt.executeQuery()
+    ) {
+
+        while (rs.next()) {
+
+            result.append(rs.getInt("id"))
+                    .append(" - ")
+                    .append(rs.getString("username"))
+                    .append(" | Role: ")
+                    .append(rs.getString("role"))
+                    .append("\n");
+        }
+
+    } catch (SQLException e) {
+        return "Failed to load users: " + e.getMessage();
+    }
+
+    if (result.length() == 0) {
+        return "No users found.";
+    }
+
+    return result.toString();
+}
 }
