@@ -53,7 +53,9 @@ public class ClientMenu {
             System.out.println("2. Login");
             System.out.println("3. View Games");
             System.out.println("4. Download Game");
-            System.out.println("5. Exit");
+            System.out.println("5. Rate Game");
+            System.out.println("6. Exit");
+            
 
             System.out.print("Choose option: ");
 
