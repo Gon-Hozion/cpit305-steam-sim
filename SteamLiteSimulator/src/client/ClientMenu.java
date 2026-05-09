@@ -14,6 +14,7 @@ public class ClientMenu {
     private static Socket socket;
     private static BufferedReader serverInput;
     private static PrintWriter serverOutput;
+    public static String loggedInUsername = "";
 
     public static void connectToServer() {
 
@@ -22,11 +23,11 @@ public class ClientMenu {
             socket = new Socket("localhost", 5000);
 
             serverInput = new BufferedReader(
-                new InputStreamReader(socket.getInputStream()));
+                    new InputStreamReader(socket.getInputStream()));
 
             serverOutput = new PrintWriter(
-                socket.getOutputStream(),
-                true);
+                    socket.getOutputStream(),
+                    true);
 
             System.out.println(serverInput.readLine());
 
@@ -110,7 +111,7 @@ public class ClientMenu {
         } else {
 
             System.out.println(
-                "Registration failed. Username may already exist.");
+                    "Registration failed. Username may already exist.");
         }
     }
 
@@ -127,8 +128,9 @@ public class ClientMenu {
         String response = sendCommand("LOGIN " + username + " " + password);
 
         if (response.startsWith("LOGIN_SUCCESS")) {
-
             String role = response.split(" ")[1];
+
+            loggedInUsername = username;
 
             System.out.println("Login successful!");
 
@@ -259,10 +261,13 @@ public class ClientMenu {
 
     public static void rateGameMenu() {
 
-        System.out.println("\n=== RATE GAME ===");
+        if (loggedInUsername.equals("")) {
 
-        System.out.print("Enter your account ID: ");
-        int accountId = input.nextInt();
+            System.out.println("You must login first.");
+            return;
+        }
+
+        System.out.println("\n=== RATE GAME ===");
 
         System.out.print("Enter game ID: ");
         int gameId = input.nextInt();
@@ -271,16 +276,23 @@ public class ClientMenu {
         int rating = input.nextInt();
 
         if (rating < 1 || rating > 5) {
+
             System.out.println("Rating must be between 1 and 5.");
             return;
         }
 
         String response
-            = sendCommand("RATE_GAME " + accountId + " " + gameId + " " + rating);
+                = sendCommand("RATE_GAME "
+                        + loggedInUsername + " "
+                        + gameId + " "
+                        + rating);
 
         if (response.equals("RATING_SUCCESS")) {
+
             System.out.println("Rating submitted successfully!");
+
         } else {
+
             System.out.println("Rating failed.");
         }
     }
