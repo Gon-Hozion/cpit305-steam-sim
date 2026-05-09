@@ -130,9 +130,12 @@ public class ClientHandler extends Thread {
                     if (parts.length == 4) {
 
                         try {
-                            int accountId = Integer.parseInt(parts[1]);
+                            String username = parts[1];
                             int gameId = Integer.parseInt(parts[2]);
                             int rating = Integer.parseInt(parts[3]);
+
+                            int accountId
+                                    = DatabaseManager.getAccountIdByUsername(username);
 
                             boolean success
                                     = DatabaseManager.rateGame(accountId, gameId, rating);
