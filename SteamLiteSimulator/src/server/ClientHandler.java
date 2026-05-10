@@ -108,6 +108,15 @@ public class ClientHandler extends Thread {
                                                 filePath,
                                                 socket.getOutputStream()
                                         );
+                                if (sent) {
+
+                                    String username = "mohammed";
+
+                                    int accountId
+                                            = DatabaseManager.getAccountIdByUsername(username);
+
+                                    DatabaseManager.recordDownload(accountId, gameId);
+                                }
 
                                 if (!sent) {
                                     System.out.println("File sending failed.");
