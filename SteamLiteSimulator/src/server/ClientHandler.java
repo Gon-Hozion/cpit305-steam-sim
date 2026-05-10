@@ -45,6 +45,7 @@ public class ClientHandler extends Thread {
 
                         if (success) {
                             output.println("REGISTER_SUCCESS");
+                            ServerLogger.log(parts[1] + " registered a new account.");
                         } else {
                             output.println("REGISTER_FAILED");
                         }
@@ -64,6 +65,7 @@ public class ClientHandler extends Thread {
 
                         if (role != null) {
                             output.println("LOGIN_SUCCESS " + role);
+                            ServerLogger.log(parts[1] + " logged in successfully.");
                         } else {
                             output.println("LOGIN_FAILED");
                         }
@@ -111,6 +113,8 @@ public class ClientHandler extends Thread {
                                                 socket.getOutputStream()
                                         );
                                 if (sent) {
+                                    
+                                    ServerLogger.log("Game ID " + gameId + " downloaded.");
 
                                     String username = "mohammed";
 
@@ -153,6 +157,7 @@ public class ClientHandler extends Thread {
 
                             if (success) {
                                 output.println("RATING_SUCCESS");
+                                ServerLogger.log(username + " rated game " + gameId + " with " + rating + " stars.");
                             } else {
                                 output.println("RATING_FAILED");
                             }
@@ -194,6 +199,7 @@ public class ClientHandler extends Thread {
 
                         if (success) {
                             output.println("ADD_GAME_SUCCESS");
+                            ServerLogger.log("Admin added game: " + title);
                         } else {
                             output.println("ADD_GAME_FAILED");
                         }
@@ -213,6 +219,7 @@ public class ClientHandler extends Thread {
 
                         if (success) {
                             output.println("DELETE_GAME_SUCCESS");
+                            ServerLogger.log("Admin deleted game ID: " + gameId);
                         } else {
                             output.println("DELETE_GAME_FAILED");
                         }

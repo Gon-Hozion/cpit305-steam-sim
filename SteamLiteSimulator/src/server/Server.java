@@ -12,6 +12,11 @@ public class Server {
             ServerSocket serverSocket = new ServerSocket(5000);
 
             System.out.println("Server started on port 5000...");
+            
+            System.out.println("=================================");
+            System.out.println(" STEAM LITE SIMULATOR SERVER ");
+            System.out.println("=================================");
+            
             System.out.println("Waiting for clients...");
 
             while (true) {

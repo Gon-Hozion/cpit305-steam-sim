@@ -48,7 +48,9 @@ public class ClientMenu {
 
         while (true) {
 
-            System.out.println("\n=== STEAM LITE SIMULATOR ===");
+            System.out.println("=================================");
+            System.out.println(" STEAM LITE SIMULATOR ");
+            System.out.println("=================================");
 
             System.out.println("1. Register");
             System.out.println("2. Login");
