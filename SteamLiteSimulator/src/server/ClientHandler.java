@@ -166,6 +166,62 @@ public class ClientHandler extends Thread {
                     }
 
                     output.println("GAMES_END");
+                } else if (command.startsWith("ADMIN_ADD_GAME")) {
+
+                    String[] parts = command.split("\\|");
+
+                    if (parts.length == 6) {
+
+                        String title = parts[1];
+                        String developer = parts[2];
+                        String genre = parts[3];
+                        double price = Double.parseDouble(parts[4]);
+                        String filePath = parts[5];
+
+                        boolean success
+                                = DatabaseManager.addGame(title, developer, genre, price, filePath);
+
+                        if (success) {
+                            output.println("ADD_GAME_SUCCESS");
+                        } else {
+                            output.println("ADD_GAME_FAILED");
+                        }
+
+                    } else {
+                        output.println("INVALID_ADD_GAME_COMMAND");
+                    }
+                } else if (command.startsWith("ADMIN_DELETE_GAME")) {
+
+                    String[] parts = command.split(" ");
+
+                    if (parts.length == 2) {
+
+                        int gameId = Integer.parseInt(parts[1]);
+
+                        boolean success = DatabaseManager.deleteGame(gameId);
+
+                        if (success) {
+                            output.println("DELETE_GAME_SUCCESS");
+                        } else {
+                            output.println("DELETE_GAME_FAILED");
+                        }
+
+                    } else {
+                        output.println("INVALID_DELETE_GAME_COMMAND");
+                    }
+                } else if (command.equals("ADMIN_VIEW_USERS")) {
+
+                    String users = DatabaseManager.getAllUsersText();
+
+                    output.println("USERS_START");
+
+                    String[] lines = users.split("\n");
+
+                    for (String line : lines) {
+                        output.println(line);
+                    }
+
+                    output.println("USERS_END");
                 } else if (command.equals("EXIT")) {
 
                     output.println("Goodbye!");
