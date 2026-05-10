@@ -24,11 +24,11 @@ public class ClientMenu {
             socket = new Socket("localhost", 5000);
 
             serverInput = new BufferedReader(
-                new InputStreamReader(socket.getInputStream()));
+                    new InputStreamReader(socket.getInputStream()));
 
             serverOutput = new PrintWriter(
-                socket.getOutputStream(),
-                true);
+                    socket.getOutputStream(),
+                    true);
 
             System.out.println(serverInput.readLine());
 
@@ -130,7 +130,7 @@ public class ClientMenu {
         } else {
 
             System.out.println(
-                "Registration failed. Username may already exist.");
+                    "Registration failed. Username may already exist.");
         }
     }
 
@@ -191,6 +191,11 @@ public class ClientMenu {
     }
 
     public static void downloadGameMenu() {
+
+        if (loggedInUsername.equals("")) {
+            System.out.println("You must login first.");
+            return;
+        }
 
         System.out.println("\n=== DOWNLOAD GAME ===");
 
@@ -302,10 +307,10 @@ public class ClientMenu {
         }
 
         String response
-            = sendCommand("RATE_GAME "
-                + loggedInUsername + " "
-                + gameId + " "
-                + rating);
+                = sendCommand("RATE_GAME "
+                        + loggedInUsername + " "
+                        + gameId + " "
+                        + rating);
 
         if (response.equals("RATING_SUCCESS")) {
 
@@ -377,7 +382,7 @@ public class ClientMenu {
         String filePath = input.nextLine();
 
         String command
-            = "ADMIN_ADD_GAME|" + title + "|" + developer + "|" + genre + "|" + price + "|" + filePath;
+                = "ADMIN_ADD_GAME|" + title + "|" + developer + "|" + genre + "|" + price + "|" + filePath;
 
         String response = sendCommand(command);
 
@@ -396,7 +401,7 @@ public class ClientMenu {
         int gameId = input.nextInt();
 
         String response
-            = sendCommand("ADMIN_DELETE_GAME " + gameId);
+                = sendCommand("ADMIN_DELETE_GAME " + gameId);
 
         if (response.equals("DELETE_GAME_SUCCESS")) {
             System.out.println("Game deleted successfully!");
