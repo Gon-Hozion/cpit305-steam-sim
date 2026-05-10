@@ -231,6 +231,28 @@ public class ClientHandler extends Thread {
                     }
 
                     output.println("USERS_END");
+                } else if (command.startsWith("MY_DOWNLOADS")) {
+
+                    String[] parts = command.split(" ");
+
+                    if (parts.length == 2) {
+
+                        String downloads
+                                = DatabaseManager.getUserDownloadsText(parts[1]);
+
+                        output.println("DOWNLOADS_START");
+
+                        String[] lines = downloads.split("\n");
+
+                        for (String line : lines) {
+                            output.println(line);
+                        }
+
+                        output.println("DOWNLOADS_END");
+
+                    } else {
+                        output.println("INVALID_DOWNLOAD_HISTORY_COMMAND");
+                    }
                 } else if (command.equals("EXIT")) {
 
                     output.println("Goodbye!");
