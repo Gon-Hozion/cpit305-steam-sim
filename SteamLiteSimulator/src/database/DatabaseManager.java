@@ -335,4 +335,63 @@ public class DatabaseManager {
 
         return -1;
     }
+
+    public static boolean recordDownload(int accountId, int gameId) {
+
+        String sql
+                = "INSERT INTO downloads(account_id, game_id, download_count) VALUES (?, ?, 1)";
+
+        try (
+                Connection conn = getConnection(); java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, accountId);
+            stmt.setInt(2, gameId);
+
+            stmt.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("Failed to record download!");
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    public static String getUserDownloadsText(String username) {
+
+        String sql
+                = "SELECT g.title, d.download_count, d.last_downloaded "
+                + "FROM downloads d "
+                + "JOIN accounts a ON d.account_id = a.id "
+                + "JOIN games g ON d.game_id = g.id "
+                + "WHERE a.username = ?";
+
+        StringBuilder result = new StringBuilder();
+
+        try (
+                Connection conn = getConnection(); java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, username);
+
+            java.sql.ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                result.append(rs.getString("title"))
+                        .append(" | Downloads: ")
+                        .append(rs.getInt("download_count"))
+                        .append(" | Last: ")
+                        .append(rs.getTimestamp("last_downloaded"))
+                        .append("\n");
+            }
+
+        } catch (SQLException e) {
+            return "Failed to load downloads: " + e.getMessage();
+        }
+
+        if (result.length() == 0) {
+            return "No downloads yet.";
+        }
+
+        return result.toString();
+    }
 }
