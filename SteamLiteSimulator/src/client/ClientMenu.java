@@ -55,9 +55,11 @@ public class ClientMenu {
             System.out.println("3. View Games");
             System.out.println("4. Download Game");
             System.out.println("5. Rate Game");
-            System.out.println("6. Exit");
+            System.out.println("6. My Downloads");
+            System.out.println("7. Exit");
+
             if (loggedInRole.equals("admin")) {
-                System.out.println("7. Admin Panel");
+                System.out.println("8. Admin Panel");
             }
 
             System.out.print("Choose option: ");
@@ -87,12 +89,16 @@ public class ClientMenu {
                     break;
 
                 case 6:
+                    myDownloadsMenu();
+                    break;
+
+                case 7:
                     sendCommand("EXIT");
                     System.out.println("Goodbye!");
                     System.exit(0);
                     break;
 
-                case 7:
+                case 8:
                     if (loggedInRole.equals("admin")) {
                         adminMenu();
                     } else {
@@ -420,6 +426,35 @@ public class ClientMenu {
 
         } catch (java.io.IOException e) {
             System.out.println("Failed to receive users from server.");
+        }
+    }
+
+    public static void myDownloadsMenu() {
+
+        if (loggedInUsername.equals("")) {
+            System.out.println("You must login first.");
+            return;
+        }
+
+        System.out.println("\n=== MY DOWNLOADS ===");
+
+        serverOutput.println("MY_DOWNLOADS " + loggedInUsername);
+
+        try {
+            String line = serverInput.readLine();
+
+            if (line.equals("DOWNLOADS_START")) {
+
+                while (!(line = serverInput.readLine()).equals("DOWNLOADS_END")) {
+                    System.out.println(line);
+                }
+
+            } else {
+                System.out.println(line);
+            }
+
+        } catch (java.io.IOException e) {
+            System.out.println("Failed to receive downloads from server.");
         }
     }
 }
