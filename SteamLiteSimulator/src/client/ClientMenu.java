@@ -15,6 +15,7 @@ public class ClientMenu {
     private static BufferedReader serverInput;
     private static PrintWriter serverOutput;
     public static String loggedInUsername = "";
+    public static String loggedInRole = "";
 
     public static void connectToServer() {
 
@@ -23,11 +24,11 @@ public class ClientMenu {
             socket = new Socket("localhost", 5000);
 
             serverInput = new BufferedReader(
-                    new InputStreamReader(socket.getInputStream()));
+                new InputStreamReader(socket.getInputStream()));
 
             serverOutput = new PrintWriter(
-                    socket.getOutputStream(),
-                    true);
+                socket.getOutputStream(),
+                true);
 
             System.out.println(serverInput.readLine());
 
@@ -55,7 +56,9 @@ public class ClientMenu {
             System.out.println("4. Download Game");
             System.out.println("5. Rate Game");
             System.out.println("6. Exit");
-            
+            if (loggedInRole.equals("admin")) {
+                System.out.println("7. Admin Panel");
+            }
 
             System.out.print("Choose option: ");
 
@@ -88,6 +91,14 @@ public class ClientMenu {
                     System.out.println("Goodbye!");
                     System.exit(0);
                     break;
+
+                case 7:
+                    if (loggedInRole.equals("admin")) {
+                        adminMenu();
+                    } else {
+                        System.out.println("Admin access only.");
+                    }
+                    break;
                 default:
                     System.out.println("Invalid option!");
             }
@@ -113,7 +124,7 @@ public class ClientMenu {
         } else {
 
             System.out.println(
-                    "Registration failed. Username may already exist.");
+                "Registration failed. Username may already exist.");
         }
     }
 
@@ -133,6 +144,7 @@ public class ClientMenu {
             String role = response.split(" ")[1];
 
             loggedInUsername = username;
+            loggedInRole = response.split(" ")[1];
 
             System.out.println("Login successful!");
 
@@ -284,10 +296,10 @@ public class ClientMenu {
         }
 
         String response
-                = sendCommand("RATE_GAME "
-                        + loggedInUsername + " "
-                        + gameId + " "
-                        + rating);
+            = sendCommand("RATE_GAME "
+                + loggedInUsername + " "
+                + gameId + " "
+                + rating);
 
         if (response.equals("RATING_SUCCESS")) {
 
@@ -296,6 +308,118 @@ public class ClientMenu {
         } else {
 
             System.out.println("Rating failed.");
+        }
+    }
+
+    public static void adminMenu() {
+
+        while (true) {
+
+            System.out.println("\n=== ADMIN PANEL ===");
+            System.out.println("1. Add Game");
+            System.out.println("2. Delete Game");
+            System.out.println("3. View Users");
+            System.out.println("4. Back");
+
+            System.out.print("Choose option: ");
+            int choice = input.nextInt();
+
+            switch (choice) {
+
+                case 1:
+                    adminAddGame();
+                    break;
+
+                case 2:
+                    adminDeleteGame();
+                    break;
+
+                case 3:
+                    adminViewUsers();
+                    break;
+
+                case 4:
+                    return;
+
+                default:
+                    System.out.println("Invalid option!");
+            }
+        }
+    }
+
+    public static void adminAddGame() {
+
+        input.nextLine();
+
+        System.out.println("\n=== ADD GAME ===");
+
+        System.out.print("Title: ");
+        String title = input.nextLine();
+
+        System.out.print("Developer: ");
+        String developer = input.nextLine();
+
+        System.out.print("Genre: ");
+        String genre = input.nextLine();
+
+        System.out.print("Price: ");
+        double price = input.nextDouble();
+
+        input.nextLine();
+
+        System.out.print("File path: ");
+        String filePath = input.nextLine();
+
+        String command
+            = "ADMIN_ADD_GAME|" + title + "|" + developer + "|" + genre + "|" + price + "|" + filePath;
+
+        String response = sendCommand(command);
+
+        if (response.equals("ADD_GAME_SUCCESS")) {
+            System.out.println("Game added successfully!");
+        } else {
+            System.out.println("Failed to add game.");
+        }
+    }
+
+    public static void adminDeleteGame() {
+
+        System.out.println("\n=== DELETE GAME ===");
+
+        System.out.print("Enter game ID: ");
+        int gameId = input.nextInt();
+
+        String response
+            = sendCommand("ADMIN_DELETE_GAME " + gameId);
+
+        if (response.equals("DELETE_GAME_SUCCESS")) {
+            System.out.println("Game deleted successfully!");
+        } else {
+            System.out.println("Failed to delete game.");
+        }
+    }
+
+    public static void adminViewUsers() {
+
+        System.out.println("\n=== USERS ===");
+
+        serverOutput.println("ADMIN_VIEW_USERS");
+
+        try {
+            String line = serverInput.readLine();
+
+            if (line.equals("USERS_START")) {
+
+                while (!(line = serverInput.readLine()).equals("USERS_END")) {
+                    System.out.println(line);
+                }
+
+            } else {
+                System.out.println(line);
+            }
+
+        } catch (java.io.IOException e) {
+            System.out.println("Failed to receive users from server.");
         }
     }
 }
