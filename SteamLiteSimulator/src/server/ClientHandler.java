@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import utils.ServerLogger;
 
 public class ClientHandler extends Thread {
 
@@ -31,6 +32,7 @@ public class ClientHandler extends Thread {
             while ((command = input.readLine()) != null) {
 
                 System.out.println("Received command: " + command);
+                ServerLogger.log("Command received: " + command);
 
                 if (command.startsWith("REGISTER")) {
 

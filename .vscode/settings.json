@@ -2,5 +2,12 @@
     "java.project.sourcePaths": [
         "SteamLiteSimulator/src"
     ],
-    "java.project.referencedLibraries": []
+    "java.project.referencedLibraries": [],
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-17",
+            "path": "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home",
+            "default": true
+        }
+    ]
 }
